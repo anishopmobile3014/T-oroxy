@@ -25,7 +25,8 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    const match = html.match(/<div[^>]*class="[^"]*Showcase_buy_box_text__[^"]*"[^>]*>(.*?)<\/div>/);
+    // استخراج قیمت دومین <div> در بخش ارزان‌ترین فروشنده
+    const match = html.match(/id="cheapest-seller"[\s\S]*?Showcase_ellipsis[^>]*>\s*<div[^>]*>.*?<\/div>\s*<div[^>]*>(.*?)<\/div>/);
 
     if (!match || !match[1]) {
       return res.status(500).json({ error: 'قیمت در HTML یافت نشد' });
@@ -33,7 +34,7 @@ module.exports = async function handler(req, res) {
 
     const priceText = match[1]
       .replace(/<[^>]+>/g, '')
-      .replace(/[٫٬,\\s]|تومان/g, '')
+      .replace(/[٫٬,\s]|تومان/g, '')
       .trim();
 
     const price = parseInt(priceText);
