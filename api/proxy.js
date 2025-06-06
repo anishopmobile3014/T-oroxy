@@ -25,14 +25,23 @@ export default async function handler(req, res) {
       });
     }
 
-    const match = html.match(/<div[^>]*Showcase_ellipsis[^>]*>\s*<div[^>]*>(.*?)<\/div>/);
+    const match = html.match(/id="cheapest-seller"[\s\S]*?Showcase_ellipsis[^>]*>\s*<div[^>]*>.*?<\/div>\s*<div[^>]*>(.*?)<\/div>/);
 
-    return res.status(200).json({
-      match_found: !!match,
-      raw_match: match ? match[1] : null,
-      truncated_html: html.substring(0, 2000)
-    });
+    if (!match || !match[1]) {
+      return res.status(500).json({ error: 'قیمت در HTML یافت نشد' });
+    }
 
+    const priceText = match[1]
+      .replace(/<[^>]+>/g, '')
+      .replace(/[٫٬,\s]|تومان/g, '')
+      .trim();
+
+    const price = parseInt(priceText);
+    if (!price || price <= 0) {
+      return res.status(500).json({ error: 'قیمت معتبر استخراج نشد' });
+    }
+
+    return res.status(200).json({ price });
   } catch (err) {
     return res.status(500).json({ error: 'خطای سرور پراکسی', message: err.message });
   }
