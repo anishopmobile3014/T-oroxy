@@ -33,9 +33,11 @@ module.exports = async function handler(req, res) {
     }
 
     const priceText = match[1]
-      .replace(/<[^>]+>/g, '')
-      .replace(/[٫٬,\s]|تومان/g, '')
-      .trim();
+  .replace(/<[^>]+>/g, '')                           // حذف تگ‌های HTML
+  .replace(/[٫٬,\s]|تومان/g, '')                    // حذف جداکننده و تومان
+  .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))  // تبدیل اعداد فارسی به انگلیسی
+  .trim();
+
 
     const price = parseInt(priceText);
     if (!price || price <= 0) {
