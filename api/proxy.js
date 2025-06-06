@@ -25,7 +25,7 @@ module.exports = async function handler(req, res) {
       });
     }
 
-    // استخراج قیمت دومین <div> در بخش ارزان‌ترین فروشنده
+    // 🎯 Regex دقیق برای گرفتن قیمت دومین <div> در فروشنده ارزان‌ترین
     const match = html.match(/id="cheapest-seller"[\s\S]*?Showcase_ellipsis[^>]*>\s*<div[^>]*>.*?<\/div>\s*<div[^>]*>(.*?)<\/div>/);
 
     if (!match || !match[1]) {
@@ -33,8 +33,9 @@ module.exports = async function handler(req, res) {
     }
 
     const priceText = match[1]
-      .replace(/<[^>]+>/g, '')
-      .replace(/[٫٬,\s]|تومان/g, '')
+      .replace(/<[^>]+>/g, '')                           // حذف تگ‌ها
+      .replace(/[٫٬,\s]|تومان/g, '')                    // حذف جداکننده و تومان
+      .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))  // تبدیل اعداد فارسی به انگلیسی
       .trim();
 
     const price = parseInt(priceText);
